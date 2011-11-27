@@ -360,10 +360,10 @@ PixelMixer = (function() {
     } else {
       this.prepareImgs(this.scope);
     }
-    this.loader = document.createElement("canvas");
-    this.loader.setAttribute("width", this.container.width());
-    this.loader.setAttribute("height", this.container.height());
-    this.loader = this.loader.getContext("2d");
+    this.loaderElm = document.createElement("canvas");
+    this.loaderElm.setAttribute("width", this.container.attr("width"));
+    this.loaderElm.setAttribute("height", this.container.attr("height"));
+    this.loader = this.loaderElm.getContext("2d");
     this.layers = new PMLayers(this.container, this);
     this.layers.add();
     this.container.bind("mousemove", function(event) {
