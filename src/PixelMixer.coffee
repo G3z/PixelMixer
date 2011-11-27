@@ -63,10 +63,10 @@ class PixelMixer
         else
             @prepareImgs(@scope)
         
-        @loader = document.createElement("canvas")
-        @loader.setAttribute("width",@container.width())
-        @loader.setAttribute("height",@container.height())
-        @loader = @loader.getContext("2d")
+        @loaderElm = document.createElement("canvas")
+        @loaderElm.setAttribute("width",@container.attr("width"))
+        @loaderElm.setAttribute("height",@container.attr("height"))
+        @loader = @loaderElm.getContext("2d")
 
         @layers = new PMLayers(@container,this)
         @layers.add()
