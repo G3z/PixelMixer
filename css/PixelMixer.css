@@ -1,0 +1,30 @@
+.pixMix_wrapper {
+  position: relative;
+  /*img {
+        position:absolute;
+        z-index:1;
+    }*/
+
+}
+.pixMix_wrapper_selected {
+  background-color: balck;
+}
+.pixMix_imageDiv {
+  background-color: #161616;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+.pixMix_overlay {
+  background-color: #161616;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  opacity: 0.3;
+}
+.pixMix_window {
+  border-radius: 15px;
+  color: #cccccc;
+}
