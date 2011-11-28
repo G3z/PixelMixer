@@ -11,9 +11,11 @@
 #@codekit-prepend PMWindow.coffee
 #@codekit-prepend PMToolBar.coffee
 #@codekit-prepend buttons/PMButton.coffee
+
 ## Standard Tools
 #@codekit-prepend tools/PMTool.coffee
 #@codekit-prepend tools/ZoomIn.coffee
+#@codekit-prepend tools/ZoomOut.coffee
 
 class PixelMixer
     ###
@@ -70,9 +72,6 @@ class PixelMixer
         else
             @prepareImgs(@scope)
         
-        @toolBar = new PMToolBar(this)
-        @toolBar.add(new ZoomIn(this))
-        
         @loaderElm = document.createElement("canvas")
         @loaderElm.setAttribute("width","1000")
         @loaderElm.setAttribute("height","1000")
@@ -80,6 +79,8 @@ class PixelMixer
 
         @layers = new PMLayers(@container,this)
         @layers.add()
+
+        @loadTools()
 
         @container.bind("mousemove",
             (event)=>
@@ -93,6 +94,11 @@ class PixelMixer
             (event)=>
                 @mouseUp(event)
         )
+
+    loadTools:()=>
+        @toolBar = new PMToolBar(this)
+        @toolBar.add(new ZoomIn(this))
+        @toolBar.add(new ZoomOut(this))
 
     mouseOver:(evt)=>
         @container[0].style.cursor='crosshair'
@@ -120,8 +126,7 @@ class PixelMixer
         }
 
     loadImg:(img)=>
-
-        @layers.l0.load(img,@loader)
+        @layers.l0.load(img)
 
     prepareImgs:(scope)=>
         scope.each(

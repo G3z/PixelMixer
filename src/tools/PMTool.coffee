@@ -1,7 +1,7 @@
 class PMTool
     @options = {}
     constructor:(icon,target,arg={action:"setActive",args:this})->
-        @button = new PMButton(38,38,icon,target,arg)
+        @button = new PMButton(32,32,icon,target,arg)
 
     leftClick:()=>
 

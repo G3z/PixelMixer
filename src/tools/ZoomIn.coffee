@@ -1,7 +1,6 @@
 class ZoomIn extends PMTool
     constructor:(pixMix)->
         args = {
-            action:"add"
-            args:1
+            action:"zoomIn"
         }
-        super("",pixMix.zoom,args)
+        super("+",pixMix.layers,args)

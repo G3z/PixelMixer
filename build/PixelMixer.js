@@ -3,7 +3,7 @@
     Editable Image with Overlay
 */
 
-var PMButton, PMCanvas, PMEditableImage, PMLayers, PMPixel, PMTool, PMToolBar, PMWindow, PixelMixer, ZoomIn,
+var PMButton, PMCanvas, PMEditableImage, PMLayers, PMPixel, PMTool, PMToolBar, PMWindow, PixelMixer, ZoomIn, ZoomOut,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = Object.prototype.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
@@ -101,19 +101,20 @@ PMCanvas = (function() {
     this.loader = this.pixMix.loader;
   }
 
-  PMCanvas.prototype.load = function(img, loader) {
+  PMCanvas.prototype.load = function(img) {
     this.img = img;
-    this.loader = loader;
-    this.left = (this.width - this.img.width * this.zoom) / 2;
-    this.top = (this.height - this.img.height * this.zoom) / 2;
-    if (this.left < 0) this.left = 0;
-    if (this.top < 0) this.top = 0;
-    this.ctx.fillStyle = "#fff";
-    this.ctx.fillRect(0, 0, this.width, this.height);
-    if (this.img.extension === "gif") {
-      return this.loadAnimation(this.img);
-    } else {
-      return this.loadStill(this.img);
+    if (this.img != null) {
+      this.left = (this.width - this.img.width * this.zoom) / 2;
+      this.top = (this.height - this.img.height * this.zoom) / 2;
+      if (this.left < 0) this.left = 0;
+      if (this.top < 0) this.top = 0;
+      this.ctx.fillStyle = "#fff";
+      this.ctx.fillRect(0, 0, this.width, this.height);
+      if (this.img.extension === "gif") {
+        return this.loadAnimation(this.img);
+      } else {
+        return this.loadStill(this.img);
+      }
     }
   };
 
@@ -121,6 +122,8 @@ PMCanvas = (function() {
     if (pixel != null) {
       this.ctx.fillStyle = pixel.hexColor();
       return this.ctx.fillRect(this.left + pixel.x * this.zoom, this.top + pixel.y * this.zoom, 1 * this.zoom, 1 * this.zoom);
+    } else {
+      return this.load(this.img);
     }
   };
 
@@ -251,7 +254,10 @@ PMLayers = (function() {
   function PMLayers(container, pixMix) {
     this.container = container;
     this.pixMix = pixMix;
+    this.zoomOut = __bind(this.zoomOut, this);
+    this.zoomIn = __bind(this.zoomIn, this);
     this.update = __bind(this.update, this);
+    this.selfUpdate = __bind(this.selfUpdate, this);
     this.add = __bind(this.add, this);
     this.length = 0;
     this.tools = new PMCanvas(this.container, 3, this.pixMix);
@@ -262,16 +268,42 @@ PMLayers = (function() {
     layer = new PMCanvas(this.container, this.length, this.pixMix);
     this.active = layer;
     this["l" + this.length] = layer;
-    return this.update();
+    return this.selfUpdate();
   };
 
-  PMLayers.prototype.update = function() {
+  PMLayers.prototype.selfUpdate = function() {
     var i, prop;
     i = 0;
     for (prop in this) {
       if (prop.slice(0, 1) === "l" && prop.length < 4) i++;
     }
     return this.length = i;
+  };
+
+  PMLayers.prototype.update = function() {
+    var i, obj, prop;
+    i = 0;
+    for (prop in this) {
+      if (prop.slice(0, 1) === "l" && prop.length < 4) {
+        obj = this[prop];
+        obj.zoom = this.pixMix.zoom;
+        obj.update();
+        i++;
+      }
+    }
+    return this.length = i;
+  };
+
+  PMLayers.prototype.zoomIn = function() {
+    this.pixMix.zoom++;
+    return this.update();
+  };
+
+  PMLayers.prototype.zoomOut = function() {
+    if (this.pixMix.zoom > 1) {
+      this.pixMix.zoom--;
+      return this.update();
+    }
   };
 
   return PMLayers;
@@ -290,13 +322,14 @@ PMToolBar = (function() {
     this.setActiveTool = __bind(this.setActiveTool, this);
     this.add = __bind(this.add, this);
     this.container = this.pixMix.container;
-    this.domElm = $("<div id=\"PMToolBar\" style=\"width:40px;height:" + (this.container.attr('height')) + "px;\"></div>");
+    this.domElm = $("<div id=\"PMToolBar\" style=\"width:70px;height:" + (this.container.attr('height')) + "px;\"></div>");
     this.container.append(this.domElm);
     this.activeTool = null;
   }
 
-  PMToolBar.prototype.add = function(button) {
-    var elm;
+  PMToolBar.prototype.add = function(tool) {
+    var button, elm;
+    button = tool.button;
     elm = button.domElm;
     return this.domElm.append(elm);
   };
@@ -327,7 +360,7 @@ PMTool = (function() {
     }
     this.rightClick = __bind(this.rightClick, this);
     this.leftClick = __bind(this.leftClick, this);
-    this.button = new PMButton(38, 38, icon, target, arg);
+    this.button = new PMButton(32, 32, icon, target, arg);
   }
 
   PMTool.prototype.leftClick = function() {};
@@ -349,27 +382,31 @@ PMTool = (function() {
 
 PMButton = (function() {
 
-  function PMButton() {
-    this.trigger = __bind(this.trigger, this);
-  }
-
-  PMButton.prototype.construcotr = function(width, height, icon, target, action) {
+  function PMButton(width, height, icon, target, action) {
+    var _this = this;
     this.width = width;
     this.height = height;
     this.icon = icon;
     this.target = target;
     this.action = action;
-    this.domElement = $("<div/>");
+    this.trigger = __bind(this.trigger, this);
+    this.domElm = $("<div/>").addClass("PMButton").addClass("blue");
     if ((this.width != null) && !(this.height != null)) {
-      return this.domElement = $("<div/>").attr("style", "width:" + this.width + "px;");
+      this.domElm.attr("style", "width:" + this.width + "px;");
     } else if (!(this.width != null) && (this.height != null)) {
-      return this.domElement = $("<div/>").attr("style", "height:" + this.height + "px;");
+      this.domElm.attr("style", "height:" + this.height + "px;");
     } else if ((this.width != null) && (this.height != null)) {
-      return this.domElement = $("<div/>").attr("style", "width:" + this.width + "px;height:" + this.height + "px;");
+      this.domElm.attr("style", "width:" + this.width + "px;height:" + this.height + "px;");
     } else {
-      return this.domElement = $("<div/>").attr("style", "width:20px;height:20px;");
+      this.domElm.attr("style", "width:20px;height:20px;");
     }
-  };
+    if (this.icon != null) {
+      if (this.icon.slice(-3, -4) !== ".") this.domElm.html(this.icon);
+    }
+    this.domElm.click(function() {
+      return _this.trigger();
+    });
+  }
 
   PMButton.prototype.trigger = function() {
     var args, method;
@@ -383,8 +420,12 @@ PMButton = (function() {
         }
       }
     }
-    if ((this.target != null) && (method != null) && (args != null)) {
-      return this.target.apply(method, args);
+    if ((this.target != null) && (method != null)) {
+      if (args != null) {
+        return this.target[method](args);
+      } else {
+        return this.target[method]();
+      }
     }
   };
 
@@ -404,13 +445,33 @@ ZoomIn = (function() {
   function ZoomIn(pixMix) {
     var args;
     args = {
-      action: "add",
-      args: 1
+      action: "zoomIn"
     };
-    ZoomIn.__super__.constructor.call(this, "", pixMix.zoom, args);
+    ZoomIn.__super__.constructor.call(this, "+", pixMix.layers, args);
   }
 
   return ZoomIn;
+
+})();
+
+/* -------------------------------------------- 
+    Begin ZoomOut.coffee 
+--------------------------------------------
+*/
+
+ZoomOut = (function() {
+
+  __extends(ZoomOut, PMTool);
+
+  function ZoomOut(pixMix) {
+    var args;
+    args = {
+      action: "zoomOut"
+    };
+    ZoomOut.__super__.constructor.call(this, "-", pixMix.layers, args);
+  }
+
+  return ZoomOut;
 
 })();
 
@@ -459,6 +520,7 @@ PixelMixer = (function() {
     this.mouseUp = __bind(this.mouseUp, this);
     this.mouseDown = __bind(this.mouseDown, this);
     this.mouseOver = __bind(this.mouseOver, this);
+    this.loadTools = __bind(this.loadTools, this);
     var scope,
       _this = this;
     this.isMouseDown = false;
@@ -501,14 +563,13 @@ PixelMixer = (function() {
     } else {
       this.prepareImgs(this.scope);
     }
-    this.toolBar = new PMToolBar(this);
-    this.toolBar.add(new ZoomIn(this));
     this.loaderElm = document.createElement("canvas");
     this.loaderElm.setAttribute("width", "1000");
     this.loaderElm.setAttribute("height", "1000");
     this.loader = this.loaderElm.getContext("2d");
     this.layers = new PMLayers(this.container, this);
     this.layers.add();
+    this.loadTools();
     this.container.bind("mousemove", function(event) {
       return _this.mouseOver(event);
     });
@@ -519,6 +580,12 @@ PixelMixer = (function() {
       return _this.mouseUp(event);
     });
   }
+
+  PixelMixer.prototype.loadTools = function() {
+    this.toolBar = new PMToolBar(this);
+    this.toolBar.add(new ZoomIn(this));
+    return this.toolBar.add(new ZoomOut(this));
+  };
 
   PixelMixer.prototype.mouseOver = function(evt) {
     var pixel;
@@ -556,7 +623,7 @@ PixelMixer = (function() {
   };
 
   PixelMixer.prototype.loadImg = function(img) {
-    return this.layers.l0.load(img, this.loader);
+    return this.layers.l0.load(img);
   };
 
   PixelMixer.prototype.prepareImgs = function(scope) {
