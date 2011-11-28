@@ -6,7 +6,7 @@
     -moz-box-shadow:    @val;
 }
 
-.pixMix_wrapper { 
+.PMwrapper { 
     //display:inline-block;
     position:relative;
     //.box-shadow(0, 0, 5px, 0.4)
@@ -16,7 +16,7 @@
     }*/
 }
 
-.pixMix_wrapper_selected { 
+.PMwrapper_selected { 
     background-color:balck;
     //display:inline-block;
     //opacity:0.5;
@@ -24,14 +24,14 @@
 
     
 }
-.pixMix_imageDiv{
+.PMimageDiv{
     background-color:rgb(22,22,22);
     position: absolute;
     top: 0;
     left: 0;
     z-index:1;
 }
-.pixMix_overlay{
+.PMoverlay{
     background-color:rgb(22,22,22);
     position: absolute;
     top: 0;
@@ -39,7 +39,18 @@
     z-index:3;
     opacity:0.3;
 }
-.pixMix_window{
+.PMwindow{
     border-radius: 15px;
     color:#cccccc;
+}
+#PMToolBar{
+    position:absolute;
+    top:0;
+    right: 0;
+    //width:40px;
+    //height:500px;
+    border-radius: 5px;
+    color:#cccccc;
+    z-index:4;
+    .box-shadow(0,0,5px,0.4)
 }

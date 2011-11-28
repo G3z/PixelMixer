@@ -1,4 +1,4 @@
-.pixMix_wrapper {
+.PMwrapper {
   position: relative;
   /*img {
         position:absolute;
@@ -6,17 +6,17 @@
     }*/
 
 }
-.pixMix_wrapper_selected {
+.PMwrapper_selected {
   background-color: balck;
 }
-.pixMix_imageDiv {
+.PMimageDiv {
   background-color: #161616;
   position: absolute;
   top: 0;
   left: 0;
   z-index: 1;
 }
-.pixMix_overlay {
+.PMoverlay {
   background-color: #161616;
   position: absolute;
   top: 0;
@@ -24,7 +24,18 @@
   z-index: 3;
   opacity: 0.3;
 }
-.pixMix_window {
+.PMwindow {
   border-radius: 15px;
   color: #cccccc;
+}
+#PMToolBar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-radius: 5px;
+  color: #cccccc;
+  z-index: 4;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+  -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
 }

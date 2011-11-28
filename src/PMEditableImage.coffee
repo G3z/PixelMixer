@@ -20,11 +20,11 @@ class PMEditableImage
         @height = $(@img).height()
         #debugger
         @wrapper = $("<div/>")
-        @wrapper.addClass("pixMix_wrapper").attr("style","width:#{@width}px;height:#{@height}px;")
+        @wrapper.addClass("PMwrapper").attr("style","width:#{@width}px;height:#{@height}px;")
         @wrapper.append("<div class=\"pixMix_imageDiv\" style=\"width:#{@width}px;height:#{@height}px;\">#{ @img.outerHTML }</div>")
 
         @overlay = $("<div/>")
-        @overlay.addClass("pixMix_overlay").attr("style","width:#{@width}px;height:#{@height}px;")
+        @overlay.addClass("PMoverlay").attr("style","width:#{@width}px;height:#{@height}px;")
         @wrapper.append( @overlay )
         @overlay.hide()
 
@@ -39,9 +39,9 @@ class PMEditableImage
         )
         $(@img).replaceWith( @wrapper )
     hoverIn:()=>
-        @wrapper.toggleClass("pixMix_wrapper_selected",true)
+        @wrapper.toggleClass("PMwrapper_selected",true)
         @overlay.fadeIn(0.6)
     
     hoverOut:(evt)=>
-        @wrapper.toggleClass("pixMix_wrapper_selected",false)
+        @wrapper.toggleClass("PMwrapper_selected",false)
         @overlay.fadeOut(0.3)
