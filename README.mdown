@@ -2,7 +2,7 @@
 PixelMixer is meant to be an online editing tool for pixel artists that want to create something on the fly in the web browser to share talent with other artists. all without leaving the web page
 
 ###How?
-PixelMixer is written in [CoffeeScript](http://jashkenas.github.com/coffee-script/) and [Less](http://lesscss.org/)
+PixelMixer is written in [CoffeeScript](http://jashkenas.github.com/coffee-script/) and [Less](http://lesscss.org/)  
 At this time PixelMixer makes great use of [jQuery](http://jquery.com/) and uses [Codekit](incident57.com/codekit/) as building tool (i'll change that once i find something as efficient)
 
 ###Why?
