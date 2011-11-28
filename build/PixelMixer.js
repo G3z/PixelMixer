@@ -3,8 +3,10 @@
     Editable Image with Overlay
 */
 
-var Button, PMCanvas, PMEditableImage, PMLayers, PMPixel, PMTool, PMToolBar, PMWindow, PixelMixer,
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+var PMButton, PMCanvas, PMEditableImage, PMLayers, PMPixel, PMTool, PMToolBar, PMWindow, PixelMixer, ZoomIn,
+  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = Object.prototype.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
 PMEditableImage = (function() {
 
@@ -345,11 +347,13 @@ PMTool = (function() {
     Basic Button Class
 */
 
-Button = (function() {
+PMButton = (function() {
 
-  function Button() {}
+  function PMButton() {
+    this.trigger = __bind(this.trigger, this);
+  }
 
-  Button.prototype.construcotr = function(width, height, icon, target, action) {
+  PMButton.prototype.construcotr = function(width, height, icon, target, action) {
     this.width = width;
     this.height = height;
     this.icon = icon;
@@ -367,7 +371,46 @@ Button = (function() {
     }
   };
 
-  return Button;
+  PMButton.prototype.trigger = function() {
+    var args, method;
+    if ((this.action != null) && (this.target != null)) {
+      if (this.action.action != null) method = this.action.action;
+      if (this.action.args != null) {
+        if ($.type(this.action.args) === "array") {
+          args = this.action.args;
+        } else {
+          args = [this.action.args];
+        }
+      }
+    }
+    if ((this.target != null) && (method != null) && (args != null)) {
+      return this.target.apply(method, args);
+    }
+  };
+
+  return PMButton;
+
+})();
+
+/* -------------------------------------------- 
+    Begin ZoomIn.coffee 
+--------------------------------------------
+*/
+
+ZoomIn = (function() {
+
+  __extends(ZoomIn, PMTool);
+
+  function ZoomIn(pixMix) {
+    var args;
+    args = {
+      action: "add",
+      args: 1
+    };
+    ZoomIn.__super__.constructor.call(this, "", pixMix.zoom, args);
+  }
+
+  return ZoomIn;
 
 })();
 
@@ -459,7 +502,7 @@ PixelMixer = (function() {
       this.prepareImgs(this.scope);
     }
     this.toolBar = new PMToolBar(this);
-    this.toolBar.add(new ZoomIn(this["this"]));
+    this.toolBar.add(new ZoomIn(this));
     this.loaderElm = document.createElement("canvas");
     this.loaderElm.setAttribute("width", "1000");
     this.loaderElm.setAttribute("height", "1000");
