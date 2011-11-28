@@ -3,7 +3,7 @@
     Editable Image with Overlay
 */
 
-var PMCanvas, PMEditableImage, PMLayers, PMPixel, PMWindow, PixelMixer,
+var Button, PMCanvas, PMEditableImage, PMLayers, PMPixel, PMTool, PMToolBar, PMWindow, PixelMixer,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 PMEditableImage = (function() {
@@ -26,10 +26,10 @@ PMEditableImage = (function() {
     this.width = $(this.img).width();
     this.height = $(this.img).height();
     this.wrapper = $("<div/>");
-    this.wrapper.addClass("pixMix_wrapper").attr("style", "width:" + this.width + "px;height:" + this.height + "px;");
+    this.wrapper.addClass("PMwrapper").attr("style", "width:" + this.width + "px;height:" + this.height + "px;");
     this.wrapper.append("<div class=\"pixMix_imageDiv\" style=\"width:" + this.width + "px;height:" + this.height + "px;\">" + this.img.outerHTML + "</div>");
     this.overlay = $("<div/>");
-    this.overlay.addClass("pixMix_overlay").attr("style", "width:" + this.width + "px;height:" + this.height + "px;");
+    this.overlay.addClass("PMoverlay").attr("style", "width:" + this.width + "px;height:" + this.height + "px;");
     this.wrapper.append(this.overlay);
     this.overlay.hide();
     $(this.wrapper).mouseenter(function() {
@@ -45,12 +45,12 @@ PMEditableImage = (function() {
   };
 
   PMEditableImage.prototype.hoverIn = function() {
-    this.wrapper.toggleClass("pixMix_wrapper_selected", true);
+    this.wrapper.toggleClass("PMwrapper_selected", true);
     return this.overlay.fadeIn(0.6);
   };
 
   PMEditableImage.prototype.hoverOut = function(evt) {
-    this.wrapper.toggleClass("pixMix_wrapper_selected", false);
+    this.wrapper.toggleClass("PMwrapper_selected", false);
     return this.overlay.fadeOut(0.3);
   };
 
@@ -252,12 +252,13 @@ PMLayers = (function() {
     this.update = __bind(this.update, this);
     this.add = __bind(this.add, this);
     this.length = 0;
-    this.tools = new PMCanvas(this.container, 50, this.pixMix);
+    this.tools = new PMCanvas(this.container, 3, this.pixMix);
   }
 
   PMLayers.prototype.add = function() {
     var layer;
     layer = new PMCanvas(this.container, this.length, this.pixMix);
+    this.active = layer;
     this["l" + this.length] = layer;
     return this.update();
   };
@@ -272,6 +273,101 @@ PMLayers = (function() {
   };
 
   return PMLayers;
+
+})();
+
+/* -------------------------------------------- 
+    Begin PMToolBar.coffee 
+--------------------------------------------
+*/
+
+PMToolBar = (function() {
+
+  function PMToolBar(pixMix) {
+    this.pixMix = pixMix;
+    this.setActiveTool = __bind(this.setActiveTool, this);
+    this.add = __bind(this.add, this);
+    this.container = this.pixMix.container;
+    this.domElm = $("<div id=\"PMToolBar\" style=\"width:40px;height:" + (this.container.attr('height')) + "px;\"></div>");
+    this.container.append(this.domElm);
+    this.activeTool = null;
+  }
+
+  PMToolBar.prototype.add = function(button) {
+    var elm;
+    elm = button.domElm;
+    return this.domElm.append(elm);
+  };
+
+  PMToolBar.prototype.setActiveTool = function(tool) {
+    return this.activeTool = tool;
+  };
+
+  return PMToolBar;
+
+})();
+
+/* -------------------------------------------- 
+    Begin PMTool.coffee 
+--------------------------------------------
+*/
+
+PMTool = (function() {
+
+  PMTool.options = {};
+
+  function PMTool(icon, target, arg) {
+    if (arg == null) {
+      arg = {
+        action: "setActive",
+        args: this
+      };
+    }
+    this.rightClick = __bind(this.rightClick, this);
+    this.leftClick = __bind(this.leftClick, this);
+    this.button = new PMButton(38, 38, icon, target, arg);
+  }
+
+  PMTool.prototype.leftClick = function() {};
+
+  PMTool.prototype.rightClick = function() {};
+
+  return PMTool;
+
+})();
+
+/* -------------------------------------------- 
+    Begin PMButton.coffee 
+--------------------------------------------
+*/
+
+/*
+    Basic Button Class
+*/
+
+Button = (function() {
+
+  function Button() {}
+
+  Button.prototype.construcotr = function(width, height, icon, target, action) {
+    this.width = width;
+    this.height = height;
+    this.icon = icon;
+    this.target = target;
+    this.action = action;
+    this.domElement = $("<div/>");
+    if ((this.width != null) && !(this.height != null)) {
+      return this.domElement = $("<div/>").attr("style", "width:" + this.width + "px;");
+    } else if (!(this.width != null) && (this.height != null)) {
+      return this.domElement = $("<div/>").attr("style", "height:" + this.height + "px;");
+    } else if ((this.width != null) && (this.height != null)) {
+      return this.domElement = $("<div/>").attr("style", "width:" + this.width + "px;height:" + this.height + "px;");
+    } else {
+      return this.domElement = $("<div/>").attr("style", "width:20px;height:20px;");
+    }
+  };
+
+  return Button;
 
 })();
 
@@ -346,6 +442,8 @@ PixelMixer = (function() {
           this.container.attr("width", "500");
           this.container.attr("height", "500");
           this.container.css("position", "relative");
+          this.container.css("width", "500px");
+          this.container.css("height", "500px");
         }
       }
     } else {
@@ -360,9 +458,11 @@ PixelMixer = (function() {
     } else {
       this.prepareImgs(this.scope);
     }
+    this.toolBar = new PMToolBar(this);
+    this.toolBar.add(new ZoomIn(this["this"]));
     this.loaderElm = document.createElement("canvas");
-    this.loaderElm.setAttribute("width", this.container.attr("width"));
-    this.loaderElm.setAttribute("height", this.container.attr("height"));
+    this.loaderElm.setAttribute("width", "1000");
+    this.loaderElm.setAttribute("height", "1000");
     this.loader = this.loaderElm.getContext("2d");
     this.layers = new PMLayers(this.container, this);
     this.layers.add();
@@ -381,10 +481,10 @@ PixelMixer = (function() {
     var pixel;
     this.container[0].style.cursor = 'crosshair';
     if (this.isMouseDown) {
-      pixel = this.pixelAtPoint(this.eventToPoint(evt));
+      pixel = this.layers.active.pixelAtPoint(this.eventToPoint(evt));
       if (pixel != null) {
         pixel.darken(20);
-        return this.update(pixel);
+        return this.layers.active.update(pixel);
       }
     }
   };
@@ -393,10 +493,10 @@ PixelMixer = (function() {
     var pixel;
     this.container[0].style.cursor = 'crosshair';
     this.isMouseDown = true;
-    pixel = this.pixelAtPoint(this.eventToPoint(evt));
+    pixel = this.layers.active.pixelAtPoint(this.eventToPoint(evt));
     if (pixel != null) {
       pixel.darken(20);
-      return this.update(pixel);
+      return this.layers.active.update(pixel);
     }
   };
 

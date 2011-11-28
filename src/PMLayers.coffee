@@ -1,10 +1,11 @@
 class PMLayers
     constructor:(@container,@pixMix)->
         @length = 0
-        @tools = new PMCanvas(@container,50,@pixMix)
+        @tools = new PMCanvas(@container,3,@pixMix)
     
     add:()=>
         layer = new PMCanvas(@container,@length,@pixMix)
+        @active = layer
         @["l"+@length] = layer
         @update()
 

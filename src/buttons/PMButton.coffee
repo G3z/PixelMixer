@@ -2,7 +2,7 @@
     Basic Button Class
 ###
 class Button
-    construcotr:(@width,@height,@icon,@action)->
+    construcotr:(@width,@height,@icon,@target,@action)->
         @domElement = $("<div/>")
         if @width? and not @height?
             @domElement = $("<div/>").attr("style","width:#{@width}px;")

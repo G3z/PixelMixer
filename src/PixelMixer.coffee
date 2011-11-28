@@ -9,6 +9,11 @@
 #@codekit-prepend PMCanvas.coffee
 #@codekit-prepend PMLayers.coffee
 #@codekit-prepend PMWindow.coffee
+#@codekit-prepend PMToolBar.coffee
+#@codekit-prepend buttons/PMButton.coffee
+## Standard Tools
+#@codekit-prepend tools/PMTool.coffee
+#@codekit-prepend tools/*
 
 class PixelMixer
     ###
@@ -51,6 +56,8 @@ class PixelMixer
                     @container.attr("width","500")
                     @container.attr("height","500")
                     @container.css("position","relative")
+                    @container.css("width","500px")
+                    @container.css("height","500px")
         else
             @scope = $("img")
             @onload = true
@@ -63,9 +70,12 @@ class PixelMixer
         else
             @prepareImgs(@scope)
         
+        @toolBar = new PMToolBar(this)
+        @toolBar.add(new ZoomIn(@this))
+        
         @loaderElm = document.createElement("canvas")
-        @loaderElm.setAttribute("width",@container.attr("width"))
-        @loaderElm.setAttribute("height",@container.attr("height"))
+        @loaderElm.setAttribute("width","1000")
+        @loaderElm.setAttribute("height","1000")
         @loader = @loaderElm.getContext("2d")
 
         @layers = new PMLayers(@container,this)
@@ -87,18 +97,19 @@ class PixelMixer
     mouseOver:(evt)=>
         @container[0].style.cursor='crosshair'
         if @isMouseDown
-            pixel = @pixelAtPoint(@eventToPoint(evt))
+            pixel = @layers.active.pixelAtPoint(@eventToPoint(evt))
             if pixel?
                 pixel.darken(20)
-                @update(pixel)
+                @layers.active.update(pixel)
     
     mouseDown:(evt)=>
         @container[0].style.cursor='crosshair'
         @isMouseDown = true
-        pixel = @pixelAtPoint(@eventToPoint(evt))
+        pixel = @layers.active.pixelAtPoint(@eventToPoint(evt))
         if pixel?
             pixel.darken(20)
-            @update(pixel)
+            @layers.active.update(pixel)
+
     mouseUp:(evt)=>
         @isMouseDown = false
 
