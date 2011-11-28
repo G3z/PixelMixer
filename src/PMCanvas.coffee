@@ -22,23 +22,26 @@ class PMCanvas
         @loader = @pixMix.loader
         #@canvas.css('cursor','crosshair')
 
-    load:(@img,@loader)=>
-        @left = (@width - @img.width*@zoom) /2
-        @top = (@height - @img.height*@zoom) /2
-        @left = 0 if @left < 0
-        @top = 0 if @top <0
-        @ctx.fillStyle = "#fff"
-        @ctx.fillRect(0,0,@width,@height)
-        if @img.extension == "gif"
-            @loadAnimation(@img)
-        else
-            @loadStill(@img)
+    load:(@img)=>
+        if @img?
+            @left = (@width - @img.width*@zoom) /2
+            @top = (@height - @img.height*@zoom) /2
+            @left = 0 if @left < 0
+            @top = 0 if @top <0
+            @ctx.fillStyle = "#fff"
+            @ctx.fillRect(0,0,@width,@height)
+            if @img.extension == "gif"
+                @loadAnimation(@img)
+            else
+                @loadStill(@img)
 
     update:(pixel)=>
         #@pixels =[]
         if pixel?
             @ctx.fillStyle = pixel.hexColor()
-            @ctx.fillRect(@left+pixel.x*@zoom,@top+pixel.y*@zoom, 1*@zoom, 1*@zoom)    
+            @ctx.fillRect(@left+pixel.x*@zoom,@top+pixel.y*@zoom, 1*@zoom, 1*@zoom)
+        else
+            @load(@img)
     
     loadStill:(@img)=>
         @loader.drawImage(@img.img,0,0)

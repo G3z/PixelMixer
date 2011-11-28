@@ -2,19 +2,21 @@
     Basic Button Class
 ###
 class PMButton
-    construcotr:(@width,@height,@icon,@target,@action)->
-        @domElement = $("<div/>")
+    constructor:(@width,@height,@icon,@target,@action)->
+        @domElm = $("<div/>").addClass("PMButton").addClass("blue")
         if @width? and not @height?
-            @domElement = $("<div/>").attr("style","width:#{@width}px;")
+            @domElm.attr("style","width:#{@width}px;")
         else if not @width? and @height?
-            @domElement = $("<div/>").attr("style","height:#{@height}px;")
+            @domElm.attr("style","height:#{@height}px;")
         else if @width? and @height?
-            @domElement = $("<div/>").attr("style","width:#{@width}px;height:#{@height}px;")
+            @domElm.attr("style","width:#{@width}px;height:#{@height}px;")
         else
-            @domElement = $("<div/>").attr("style","width:20px;height:20px;")
-        
-        
-    
+            @domElm.attr("style","width:20px;height:20px;")
+        if @icon?
+            if @icon[-3...-4] != "."
+                @domElm.html(@icon)
+        @domElm.click(()=>@trigger())
+            
     trigger:()=>
         if @action? and @target?
             if @action.action?
@@ -24,5 +26,8 @@ class PMButton
                     args = @action.args
                 else
                     args = [@action.args]
-        if @target? and method? and args?
-            @target.apply(method,args)
+        if @target? and method?
+            if args?
+                @target[method](args)
+            else
+                @target[method]()
