@@ -13,7 +13,7 @@
 #@codekit-prepend buttons/PMButton.coffee
 ## Standard Tools
 #@codekit-prepend tools/PMTool.coffee
-#@codekit-prepend tools/*
+#@codekit-prepend tools/ZoomIn.coffee
 
 class PixelMixer
     ###
@@ -71,7 +71,7 @@ class PixelMixer
             @prepareImgs(@scope)
         
         @toolBar = new PMToolBar(this)
-        @toolBar.add(new ZoomIn(@this))
+        @toolBar.add(new ZoomIn(this))
         
         @loaderElm = document.createElement("canvas")
         @loaderElm.setAttribute("width","1000")
