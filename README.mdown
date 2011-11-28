@@ -3,10 +3,13 @@ PixelMixer is meant to be an online editing tool for pixel artists that want to 
 
 ###How?
 PixelMixer is written in [CoffeeScript](http://jashkenas.github.com/coffee-script/) and [Less](http://lesscss.org/)
-At this time PixelMixer makes great use of jQuery
+At this time PixelMixer makes great use of [jQuery](http://jquery.com/) and uses [Codekit](incident57.com/codekit/) as building tool (i'll change that once i find something as efficient)
 
 ###Why?
 Currently these usage scenarios are supported
 *Dedicated editor page
 *Bookmarklet to be used on every page that contains images
 *Library to be included on a sites that requires image editing
+
+###When?
+You probably noticed the whole thing is not even in alpa stage, have faith, i'm working on it whenever i can
